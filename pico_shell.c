@@ -1,53 +1,47 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <stdlib.h>
-#define MAX_INPUT_SIZE 1024
-#define PROMPT "Femto shell prompt > "
+#include <sys/wait.h>
 
-int main(int argc, char *argv[]) {
-    char input[MAX_INPUT_SIZE];
-    char str[] = "This is a sample string";
-    char *token;
-    
-    // Get the first token
-    token = strtok(str, " ");
-    
-    // Walk through other tokens
-    while (token != NULL) {
-        printf("%s\n", token);
-        token = strtok(NULL, " ");
+#define BUF_SIZE 1024
+int main(){
+        pid_t pid;
+        char buf[BUF_SIZE];
+        while(1){
+                printf("linux command line$ ");
+                fgets(buf, BUF_SIZE, stdin);
+                buf[strlen(buf)-1] = 0;
+                if(strcmp("exit", buf) == 0)
+                        break;
+                if(strlen(buf) == 0){
+                        continue;
+                }
+                pid = fork();
+                if(pid > 0){
+                        int status;
+                        wait(&status);
+                }
+                else if(pid == 0){
+                    char *argv = strtok(buf," ");
+                    int cap = 5;
+                    char **strings  = (char**)malloc(cap*sizeof(char*));
+                    for(int  i = 0 ; argv!=NULL;i++){
+                            if(i >= cap){
+                                    cap *= 2;
+                                    strings = (char**)realloc(strings,cap*sizeof(char*));
+                            }
+                            strings[i] = argv;
+                            argv = strtok(NULL," ");
+                    }
+                    execvp(buf , strings);
+                    free(strings);
+                    exit(-1);
+            }
+            else{
+                    printf("failure");
+            }
+
     }
-    
     return 0;
-    /*while (1) {
-        // Display prompt
-        printf("%s", PROMPT);
-        //fflush(stdout);
-        
-        // Get input from user
-        if (fgets(input, MAX_INPUT_SIZE, stdin) == NULL) {
-            break; // Handle EOF (Ctrl+D)
-        }
-        
-        // Remove trailing newline
-        input[strcspn(input, "\n")] = '\0';
-        if(strlen(input) == 0)
-            continue;
-        // Check if input starts with "exit"
-        if (strcmp(input, "exit") == 0) {
-            printf("Good Bye\n");
-            break;
-        }
-        // Check if input starts with "echo "
-        else if (strncmp(input, "echo ", 5) == 0) {
-            // Print everything after "echo "
-            printf("%s\n", input + 5);
-        }
-        // Any other command is invalid
-        else {
-            printf("Invalid command\n");
-        }
-    }
-    
-    return 0;*/
 }
