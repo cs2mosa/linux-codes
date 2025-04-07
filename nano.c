@@ -23,8 +23,8 @@ int main(){
 		LOCAL_VARS[BUF_SIZE-1] = NULL;
 		char *dol = strchr(buf, '$');
 		if (dol != NULL) {
-    			char *end = dol + 1;
-    			while (*end != '\0' && *end != ' ') {
+    			char *end = dol+1;
+			while (*end != '\0' && *end != ' ') {
         			end++;
     			}
     		char saved = *end;
@@ -32,7 +32,7 @@ int main(){
     		for (int i = 0; LOCAL_VARS[i] != NULL; i++) {
         		char *equals = strchr(LOCAL_VARS[i], '=');
         		if (equals && strncmp(LOCAL_VARS[i], dol+1, equals-LOCAL_VARS[i]) == 0) {
-            			char *value = equals + 1;
+				char *value = equals + 1;
 				char result[1024] = {0};
             			strncpy(result, buf, dol - buf);
             			strcat(result, value);
@@ -82,14 +82,12 @@ int main(){
             		if (strings[1] != NULL) {
                 		printf("Invalid command\n");
             		} else {
-				LOCAL_VARS[i] = strings[0];i++;
-                		/*char *eq = strchr(strings[0], '=');
-                		*eq = '\0';               
-                		char *var = strings[0];      
-                		char *val = eq + 1;        
-                		if (setenv(var, val, 1) != 0) {
-                    			perror("setenv failed");
-                		}*/
+				int l = 0;
+				LOCAL_VARS[l] = (char*)malloc(strlen(strings[0]) + 1);
+				if (LOCAL_VARS[l] != NULL) {
+    					strcpy(LOCAL_VARS[l], strings[0]);
+    					l++;
+				}
             		}
             		free(strings);
            	 	continue; 
